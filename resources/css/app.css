@@ -1,0 +1,240 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+
+.site-wallpaper {
+    background-color: #f8fafc;
+    background-image: linear-gradient(rgb(248 250 252 / 65%), rgb(248 250 252 / 65%)), url('/images/oiland-wallpaper.png');
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.station-filter-field {
+    background-color: #fff !important;
+    color: #0f172a !important;
+    color-scheme: light;
+}
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /*
+     * Brand palette: teal carries the primary interactive colour, deep blue
+     * anchors the dark bands (hero, footer), and orange is reserved for calls
+     * to action and promotional moments. Neutrals stay on the default slate
+     * ramp so greys read cool against the teal.
+     */
+    --color-brand-50: #f0fdfa;
+    --color-brand-100: #ccfbf1;
+    --color-brand-200: #99f6e4;
+    --color-brand-300: #5eead4;
+    --color-brand-400: #2dd4bf;
+    --color-brand-500: #14b8a6;
+    --color-brand-600: #0d9488;
+    --color-brand-700: #0f766e;
+    --color-brand-800: #115e59;
+    --color-brand-900: #134e4a;
+    --color-brand-950: #042f2e;
+
+    --color-deep-50: #eff6fb;
+    --color-deep-100: #dbeafe;
+    --color-deep-200: #bfdbfe;
+    --color-deep-300: #93c5fd;
+    --color-deep-400: #60a5fa;
+    --color-deep-500: #3b82f6;
+    --color-deep-600: #2563eb;
+    --color-deep-700: #1d4ed8;
+    --color-deep-800: #1e40af;
+    --color-deep-900: #1e3a8a;
+    --color-deep-950: #0c1f44;
+
+    --color-accent-50: #fff7ed;
+    --color-accent-100: #ffedd5;
+    --color-accent-200: #fed7aa;
+    --color-accent-300: #fdba74;
+    --color-accent-400: #fb923c;
+    --color-accent-500: #f97316;
+    --color-accent-600: #ea580c;
+    --color-accent-700: #c2410c;
+    --color-accent-800: #9a3412;
+    --color-accent-900: #7c2d12;
+    --color-accent-950: #431407;
+}
+
+html.dark {
+    color-scheme: dark;
+    /* Keep white available for high contrast text and icons. */
+    --color-white: #ffffff;
+    --color-slate-50: #101a2b;
+    --color-slate-100: #1b293b;
+    --color-slate-200: #526277;
+    --color-slate-300: #718198;
+    --color-slate-400: #b6c3d5;
+    --color-slate-500: #cbd5e1;
+    --color-slate-600: #dbe5f2;
+    --color-slate-700: #e8eef7;
+    --color-slate-800: #f3f6fb;
+    --color-slate-900: #ffffff;
+}
+
+/* Tailwind's white surface utilities share a color token with text-white.
+   Recolor only the backgrounds so white foreground text stays white. */
+html.dark [class~="bg-white"] {
+    background-color: #1b293b;
+}
+
+html.dark [class~="bg-white/90"],
+html.dark [class~="bg-white/95"] {
+    background-color: rgb(27 41 59 / 95%);
+}
+
+html.dark .site-wallpaper {
+    background-color: #101a2b;
+    background-image: linear-gradient(rgb(16 26 43 / 90%), rgb(16 26 43 / 90%)), url('/images/oiland-wallpaper.png');
+}
+
+/* Keep colored labels readable against the dark surfaces too. */
+html.dark [class~="text-brand-600"],
+html.dark [class~="text-brand-700"],
+html.dark [class~="text-brand-800"],
+html.dark [class~="text-brand-900"],
+html.dark [class~="text-deep-700"],
+html.dark [class~="text-deep-800"],
+html.dark [class~="text-deep-950"] {
+    color: #5eead4;
+}
+
+html.dark [class~="text-accent-600"],
+html.dark [class~="text-accent-700"],
+html.dark [class~="text-amber-600"],
+html.dark [class~="text-amber-700"],
+html.dark [class~="text-amber-800"],
+html.dark [class~="text-amber-900"] {
+    color: #fbbf24;
+}
+
+html.dark [class~="text-emerald-700"],
+html.dark [class~="text-emerald-800"],
+html.dark [class~="text-emerald-900"] {
+    color: #6ee7b7;
+}
+
+html.dark [class~="text-rose-600"],
+html.dark [class~="text-rose-700"],
+html.dark [class~="text-rose-800"],
+html.dark [class~="text-rose-900"] {
+    color: #fda4af;
+}
+
+html.dark [class~="text-sky-700"],
+html.dark [class~="text-sky-800"],
+html.dark [class~="text-violet-600"],
+html.dark [class~="text-violet-700"],
+html.dark [class~="text-violet-800"] {
+    color: #a5c8ff;
+}
+
+html.dark .home-filter-card {
+    background-color: #24384f;
+    border-color: #718198;
+    color: #f3f6fb;
+}
+
+html.dark .home-filter-card:hover,
+html.dark .home-filter-card:focus-visible {
+    background-color: #2b465c;
+    border-color: #5eead4;
+}
+
+html.dark .home-filter-card:hover [class~="text-slate-700"],
+html.dark .home-filter-card:focus-visible [class~="text-slate-700"] {
+    color: #ffffff;
+}
+
+html.dark .home-region-chip {
+    background-color: #2b4058;
+    border: 1px solid #718198;
+    color: #f3f6fb;
+}
+
+html.dark .home-region-chip:hover,
+html.dark .home-region-chip:focus-visible {
+    background-color: #0f766e;
+    border-color: #5eead4;
+    color: #ffffff;
+}
+
+html.dark .home-filter-card:focus-visible,
+html.dark .home-region-chip:focus-visible {
+    outline: 2px solid #5eead4;
+    outline-offset: 2px;
+}
+
+html.dark .station-result-card {
+    background-color: #253b53;
+    border-color: #91a4bb;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 24%);
+}
+
+html.dark .station-result-card a.font-semibold {
+    color: #ffffff;
+}
+
+html.dark .station-result-card a.font-semibold:hover {
+    color: #5eead4;
+}
+
+@layer components {
+    .star-rating {
+        letter-spacing: 0.1em;
+    }
+
+    /* Leaflet renders its own controls; align them with the app chrome and
+       keep them below our dropdown panels. */
+    [data-locator] {
+        font-family: var(--font-sans);
+        z-index: 0;
+    }
+
+    /*
+     * Teal branch pin. Drawn with CSS rather than Leaflet's default marker
+     * sprite, which bundlers routinely fail to resolve, so the locator needs
+     * no image assets and stays on brand.
+     */
+    .oiland-branch-marker {
+        background: transparent;
+        border: 0;
+    }
+
+    .oiland-branch-marker__dot {
+        display: block;
+        width: 18px;
+        height: 18px;
+        border-radius: 9999px;
+        background: var(--color-brand-600);
+        border: 2px solid var(--color-brand-700);
+        box-shadow: 0 1px 4px rgb(15 23 42 / 0.35);
+    }
+
+    .oiland-branch-marker--nearest .oiland-branch-marker__dot {
+        width: 26px;
+        height: 26px;
+        background: #f97316;
+        border: 3px solid #ffffff;
+        box-shadow: 0 0 0 3px rgb(249 115 22 / 32%), 0 2px 8px rgb(15 23 42 / 0.4);
+    }
+
+    .oiland-branch-marker:hover .oiland-branch-marker__dot,
+    .oiland-branch-marker:focus-visible .oiland-branch-marker__dot {
+        background: var(--color-brand-700);
+        transform: scale(1.12);
+    }
+
+    .leaflet-container {
+        font-family: var(--font-sans);
+    }
+}
