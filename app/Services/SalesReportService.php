@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\FuelType;
 use App\Enums\PaymentMethod;
 use App\Enums\SaleSource;
 use App\Models\Branch;
@@ -136,15 +137,18 @@ class SalesReportService
         $rows = Sale::query()
             ->forBranchScope($branchId)
             ->betweenDates($from->toDateString(), $to->toDateString())
-            ->selectRaw('item_name, SUM(total_amount) as revenue, SUM(quantity) as quantity')
-            ->groupBy('item_name')
+            ->join('catalog_items', 'catalog_items.id', '=', 'sales.catalog_item_id')
+            ->whereIn('catalog_items.sku', ['FUEL-DSL', 'FUEL-P95', 'FUEL-U91'])
+            ->selectRaw('catalog_items.id as catalog_item_id, catalog_items.name as product_name, catalog_items.fuel_type, SUM(sales.total_amount) as revenue, SUM(sales.quantity) as quantity')
+            ->groupBy('catalog_items.id', 'catalog_items.name', 'catalog_items.fuel_type')
             ->orderByDesc('revenue')
             ->get();
 
         $total = (float) $rows->sum('revenue');
 
         return $rows->map(fn ($row) => [
-            'label' => $row->item_name,
+            'label' => FuelType::tryFrom((string) $row->fuel_type)?->label()
+                ?? $row->product_name,
             'revenue' => round((float) $row->revenue, 2),
             'quantity' => round((float) $row->quantity, 3),
             'share' => $total > 0 ? round(((float) $row->revenue / $total) * 100, 1) : 0.0,

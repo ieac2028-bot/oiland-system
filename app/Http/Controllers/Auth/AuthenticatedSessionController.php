@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,6 +31,11 @@ class AuthenticatedSessionController extends Controller
         }
 
         $request->session()->regenerate();
+
+        $user = $request->user();
+        if ($user?->isSuperAdmin() || $user?->role === UserRole::BranchAdmin) {
+            return redirect()->route('home');
+        }
 
         return redirect()->intended($this->redirectTo($request));
     }

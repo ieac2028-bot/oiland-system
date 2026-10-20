@@ -14,7 +14,7 @@
     @include('layouts.partials.navbar')
     @include('layouts.partials.admin-sidebar')
 
-    <div class="flex min-w-0 flex-1 flex-col lg:pl-72">
+    <div class="wallpaper-content-layer flex min-w-0 flex-1 flex-col lg:pl-72">
         <header class="sticky top-[100px] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
             <div class="flex h-16 items-center gap-4 px-4 sm:px-6">
                 <button type="button" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden" data-sidebar-toggle>

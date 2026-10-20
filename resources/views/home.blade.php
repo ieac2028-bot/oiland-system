@@ -90,16 +90,31 @@
 
                 <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($fuels as $fuel)
-                        <div class="flex flex-col rounded-xl border border-slate-200 bg-white p-5">
+                        <div class="fuel-grade-card fuel-grade-card--{{ $fuel->fuel_type?->value ?? 'default' }} flex flex-col rounded-xl border border-slate-200 bg-white p-5">
                             <div class="flex items-center gap-3">
-                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-50 text-accent-600 transition group-hover:bg-accent-500 group-hover:text-white">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M5 8h14M7 8l-3 6h6L7 8Zm10 0-3 6h6l-3-6Z" />
-                                    </svg>
+                                <span class="fuel-grade-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                                    @if ($fuel->fuel_type?->value === 'unleaded')
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 4c-8 0-14 3.8-14 10a5 5 0 0 0 5 5c6.2 0 9-7 9-15ZM5 21c2.5-5 6.2-8.2 11-11" />
+                                        </svg>
+                                    @elseif ($fuel->fuel_type?->value === 'premium')
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m12 3 2.4 5.1 5.6.7-4.1 3.9 1 5.5-4.9-2.8-4.9 2.8 1-5.5L4 8.8l5.6-.7L12 3Z" />
+                                            <path stroke-linecap="round" d="M12 1v1m9 2-.8.8M3 4l.8.8" />
+                                        </svg>
+                                    @elseif ($fuel->fuel_type?->value === 'diesel')
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M4 21h13M8 7h5v5H8zM16 8h1.5l2 2.5V17a2 2 0 0 1-4 0v-3" />
+                                        </svg>
+                                    @else
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M5 8h14M7 8l-3 6h6L7 8Zm10 0-3 6h6l-3-6Z" />
+                                        </svg>
+                                    @endif
                                 </span>
-                                <h3 class="font-semibold text-slate-900">{{ $fuel->displayName() }}</h3>
+                                <h3 class="fuel-grade-title font-semibold">{{ $fuel->displayName() }}</h3>
                             </div>
-                            <p class="mt-3 line-clamp-2 text-sm text-slate-600">{{ $fuel->short_description }}</p>
+                            <p class="fuel-grade-description mt-3 line-clamp-2 text-sm">{{ $fuel->short_description }}</p>
                         </div>
                     @endforeach
                 </div>
@@ -107,8 +122,14 @@
         </section>
     @endif
 
-    <section class="bg-gradient-to-r from-brand-800 to-deep-900 py-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section class="ambient-lines-panel relative isolate overflow-hidden bg-gradient-to-r from-brand-800 to-deep-900 py-12">
+        <svg class="ambient-lines ambient-lines--panel" data-ambient-lines viewBox="0 0 1440 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d="M-100 210 C180 40 320 320 600 130 S980 20 1540 190" />
+            <path d="M-80 90 C240 280 360 20 700 160 S1120 290 1520 80" />
+            <path d="M220 -40 C420 80 120 190 360 310 S720 250 820 -30" />
+            <path d="M980 -50 C760 40 1160 100 920 190 S880 250 1100 320" />
+        </svg>
+        <div class="relative z-[1] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid gap-6 sm:grid-cols-3">
                 <x-stat label="Network average rating" :value="number_format($averageRating, 1).' / 5'" tone="brand" class="!border-white/15 !bg-white/10" />
                 <x-stat label="Cities served" :value="number_format($cityCount)" tone="accent" class="!border-white/15 !bg-white/10" />

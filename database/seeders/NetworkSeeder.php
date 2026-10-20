@@ -670,8 +670,8 @@ class NetworkSeeder extends Seeder
     private function seedSuperAdmins(): void
     {
         foreach ([
-            ['email' => self::SUPER_ADMIN_EMAIL, 'name' => 'Michael Lopez'],
-            ['email' => 'jan.davide@oiland.test', 'name' => 'Jan Davide De Vera'],
+            ['email' => self::SUPER_ADMIN_EMAIL, 'name' => 'Jerome Tabilon'],
+            ['email' => 'jan.davide@oiland.test', 'name' => 'Trixie Constantino'],
         ] as $account) {
             User::query()->updateOrCreate(
                 ['email' => $account['email']],

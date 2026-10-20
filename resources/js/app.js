@@ -1,5 +1,6 @@
 import './bootstrap';
 import './modules/branch-locator';
+import './modules/accessibility';
 import './modules/dashboard-charts';
 import './modules/interactions';
 import './modules/timekeeping-dashboard';

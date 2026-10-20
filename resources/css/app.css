@@ -1,5 +1,238 @@
 @import 'tailwindcss';
 
+/* Reveal the incoming color scheme from the theme control that was clicked. */
+@keyframes theme-circle-reveal {
+    from {
+        clip-path: circle(0 at var(--theme-origin-x) var(--theme-origin-y));
+    }
+
+    to {
+        clip-path: circle(150vmax at var(--theme-origin-x) var(--theme-origin-y));
+    }
+}
+
+::view-transition-old(root) {
+    animation: none;
+}
+
+::view-transition-new(root) {
+        animation: theme-circle-reveal 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Subtle animated SVG contour lines drift with the pointer, like the reference site. */
+body.site-wallpaper { position: relative; isolation: isolate; }
+body.site-wallpaper > main,
+body.site-wallpaper > footer { position: relative; z-index: 2; }
+.wallpaper-content-layer {
+    position: relative;
+    z-index: 1;
+}
+.ambient-lines {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    opacity: 0.9;
+}
+.ambient-lines path {
+    fill: none;
+    stroke: rgb(75 97 143 / 48%);
+    stroke-width: 1.15;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    transform-box: view-box;
+    translate: var(--line-pointer-x, 0px) var(--line-pointer-y, 0px);
+    transition: translate 140ms ease-out;
+    animation: ambient-flow 5.2s ease-in-out infinite alternate;
+}
+.ambient-lines path:nth-child(2) { animation-duration: 6.4s; animation-delay: -1.8s; }
+.ambient-lines path:nth-child(3) { animation-duration: 7.2s; animation-delay: -2.7s; }
+.ambient-lines path:nth-child(4) { animation-duration: 8s; animation-delay: -3.6s; }
+html.dark .ambient-lines path { stroke: rgb(151 169 211 / 48%); }
+.ambient-lines--panel {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.62;
+    overflow: hidden;
+}
+.ambient-lines--panel path { stroke: rgb(255 255 255 / 38%); stroke-width: 1.5; }
+@keyframes ambient-flow {
+    from { transform: translate(-82px, -58px); }
+    to { transform: translate(82px, 58px); }
+}
+
+/* Reference-inspired accessibility launcher and compact settings panel. */
+.accessibility { position: fixed; left: 12px; bottom: 12px; z-index: 70; }
+.accessibility-launcher {
+    width: 194px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 6px 22px rgb(0 0 0 / 20%);
+    cursor: pointer;
+    text-align: left;
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.accessibility-launcher:hover,
+.accessibility-launcher:focus-visible { transform: translateY(-2px); border-color: #0f766e; box-shadow: 0 9px 26px rgb(0 0 0 / 25%); }
+.accessibility-launcher:focus-visible,
+.accessibility-panel button:focus-visible { outline: 3px solid #0d9488; outline-offset: 3px; }
+.accessibility-icon { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; border-radius: 50%; background: #f0fdfa; color: #0f766e; }
+.accessibility-icon svg { width: 24px; height: 24px; fill: currentColor; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+.accessibility-copy { display: grid; gap: 2px; }
+.accessibility-copy strong { font-size: .82rem; line-height: 1.2; }
+.accessibility-copy small { color: #475569; font-size: .65rem; line-height: 1.2; }
+.accessibility-panel {
+    position: absolute;
+    left: 0;
+    bottom: 66px;
+    width: min(330px, calc(100vw - 24px));
+    padding: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 18px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 18px 55px rgb(0 0 0 / 24%);
+    font-size: .88rem;
+}
+.accessibility-panel[hidden] { display: none; }
+html.dark .accessibility-panel { border-color: #526277; background: #1b293b; color: #f3f6fb; }
+.accessibility-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid #dbe3e8; }
+html.dark .accessibility-head { border-color: #526277; }
+.accessibility-head div { display: grid; gap: 3px; }
+.accessibility-head h2 { margin: 0; font-size: 1rem; font-weight: 700; }
+.accessibility-head span { color: #475569; font-size: .75rem; }
+html.dark .accessibility-head span,
+html.dark .accessibility-option small { color: #cbd5e1; }
+.accessibility-head button { border: 0; border-radius: 6px; background: transparent; color: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; }
+.accessibility-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0 10px; }
+.accessibility-size-options { display: flex; gap: 5px; }
+.accessibility-size-options button { min-width: 38px; height: 36px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; color: #0f172a; cursor: pointer; }
+html.dark .accessibility-size-options button { border-color: #526277; background: #101a2b; color: #f3f6fb; }
+.accessibility-size-options button[aria-pressed="true"] { border-color: #0f766e; background: #f0fdfa; color: #115e59; }
+html.dark .accessibility-size-options button[aria-pressed="true"] { border-color: #5eead4; background: #042f2e; color: #ccfbf1; }
+.accessibility-size-options sup { font-size: .62em; }
+.accessibility-option { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border: 0; border-top: 1px solid #dbe3e8; background: transparent; color: inherit; text-align: left; font: inherit; cursor: pointer; }
+html.dark .accessibility-option { border-color: #526277; }
+.accessibility-option > span { display: grid; gap: 3px; }
+.accessibility-option strong { font-size: .82rem; }
+.accessibility-option small { color: #475569; font-size: .7rem; line-height: 1.3; }
+.accessibility-option i { position: relative; width: 38px; height: 22px; flex: 0 0 38px; border-radius: 20px; background: #738095; transition: background 160ms ease; }
+.accessibility-option i::after { position: absolute; top: 4px; left: 4px; width: 14px; height: 14px; border-radius: 50%; background: #fff; content: ''; transition: transform 160ms ease; }
+.accessibility-option[aria-pressed="true"] i { background: #0f766e; }
+.accessibility-option[aria-pressed="true"] i::after { transform: translateX(16px); }
+.accessibility-reset { margin-top: 10px; padding: 8px 0 0; border: 0; background: none; color: #0f766e; font: inherit; font-size: .8rem; cursor: pointer; }
+html.dark .accessibility-reset { color: #5eead4; }
+
+html.a11y-text-large { font-size: 112.5%; }
+html.a11y-text-largest { font-size: 125%; }
+html.a11y-high-contrast { --color-slate-400: #475569; --color-slate-500: #334155; }
+html.dark.a11y-high-contrast { --color-slate-200: #718198; --color-slate-300: #aab9cc; --color-slate-400: #d3deeb; --color-slate-500: #e2eaf4; }
+html.a11y-underline-links main a { text-decoration: underline !important; text-underline-offset: .18em; }
+html.a11y-text-spacing main p,
+html.a11y-text-spacing main li,
+html.a11y-text-spacing main label,
+html.a11y-text-spacing main input,
+html.a11y-text-spacing main textarea,
+html.a11y-text-spacing main select { letter-spacing: .04em !important; word-spacing: .12em !important; line-height: 1.8 !important; }
+html.a11y-plain-font { --font-sans: Arial, Helvetica, sans-serif; }
+html.a11y-reduce-motion *,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+html.a11y-reduce-motion .ambient-lines path { translate: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+    .ambient-lines path { animation: none; translate: none; transition: none; }
+}
+@media (max-width: 560px) {
+    .accessibility { left: 10px; bottom: 10px; }
+    .accessibility-launcher { width: 184px; min-height: 52px; padding: 6px 11px; }
+    .accessibility-icon { width: 36px; height: 36px; flex-basis: 36px; }
+    .accessibility-panel { bottom: 62px; }
+}
+
+/* Keep the moving contours inside fuel cards, between their surface and content. */
+.fuel-grade-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.fuel-grade-card::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 440 170' fill='none'%3E%3Cg stroke='%230f172a' stroke-opacity='.55' stroke-width='1.1'%3E%3Cpath d='M-25 98C35 15 92 28 132 88s88 99 143 30 108-87 190-19M-30 128c58-78 115-63 163-5s85 75 132 24 101-79 184-20M42-22c43 51 68 87 34 127s-17 70 29 94M226-20c-41 60-28 96 20 115s67 48 41 95M335-18c-34 46-26 79 20 101s58 44 36 88'/%3E%3C/g%3E%3C/svg%3E");
+    background-position: 44% 54%;
+    background-size: 155% 155%;
+    opacity: 0.3;
+    animation: fuel-card-contour-drift 12s ease-in-out infinite alternate;
+}
+
+.fuel-grade-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Give each fuel grade a distinct, high-contrast label and matching icon. */
+.fuel-grade-card--diesel .fuel-grade-icon { background: #fff7ed; color: #92400e; }
+.fuel-grade-card--diesel .fuel-grade-title,
+.fuel-grade-card--diesel .fuel-grade-description { color: #78350f; }
+.fuel-grade-card--unleaded .fuel-grade-icon { background: #f0fdf4; color: #166534; }
+.fuel-grade-card--unleaded .fuel-grade-title,
+.fuel-grade-card--unleaded .fuel-grade-description { color: #166534; }
+.fuel-grade-card--premium .fuel-grade-icon { background: #fef2f2; color: #991b1b; }
+.fuel-grade-card--premium .fuel-grade-title,
+.fuel-grade-card--premium .fuel-grade-description { color: #991b1b; }
+
+html.dark .fuel-grade-card {
+    background-color: #1b293b;
+}
+
+html.dark .fuel-grade-card--diesel .fuel-grade-icon { background: #422006; color: #fcd34d; }
+html.dark .fuel-grade-card--diesel .fuel-grade-title,
+html.dark .fuel-grade-card--diesel .fuel-grade-description { color: #fde68a; }
+html.dark .fuel-grade-card--unleaded .fuel-grade-icon { background: #052e16; color: #86efac; }
+html.dark .fuel-grade-card--unleaded .fuel-grade-title,
+html.dark .fuel-grade-card--unleaded .fuel-grade-description { color: #bbf7d0; }
+html.dark .fuel-grade-card--premium .fuel-grade-icon { background: #450a0a; color: #fca5a5; }
+html.dark .fuel-grade-card--premium .fuel-grade-title,
+html.dark .fuel-grade-card--premium .fuel-grade-description { color: #fecaca; }
+
+html.dark .fuel-grade-card::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 440 170' fill='none'%3E%3Cg stroke='%23f3f6fb' stroke-opacity='.72' stroke-width='1.1'%3E%3Cpath d='M-25 98C35 15 92 28 132 88s88 99 143 30 108-87 190-19M-30 128c58-78 115-63 163-5s85 75 132 24 101-79 184-20M42-22c43 51 68 87 34 127s-17 70 29 94M226-20c-41 60-28 96 20 115s67 48 41 95M335-18c-34 46-26 79 20 101s58 44 36 88'/%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.3;
+}
+
+html.a11y-high-contrast .fuel-grade-card::before { opacity: 0.58; }
+html.dark.a11y-high-contrast .fuel-grade-card::before { opacity: 0.5; }
+
+@keyframes fuel-card-contour-drift {
+    from { background-position: 44% 54%; }
+    to { background-position: 56% 46%; }
+}
+
+html.a11y-reduce-motion .fuel-grade-card::before {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fuel-grade-card::before { animation: none; }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -90,6 +323,18 @@ html.dark [class~="bg-white"] {
 html.dark [class~="bg-white/90"],
 html.dark [class~="bg-white/95"] {
     background-color: rgb(27 41 59 / 95%);
+}
+
+/* Keep the primary header legible across both theme states. */
+.site-header .header-choice,
+.site-header .header-choice:hover {
+    color: #000;
+    font-weight: 700;
+}
+
+html.dark .site-header .header-choice,
+html.dark .site-header .header-choice:hover {
+    color: #fff;
 }
 
 html.dark .site-wallpaper {
