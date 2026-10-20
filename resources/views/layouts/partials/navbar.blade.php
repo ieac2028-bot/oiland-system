@@ -75,11 +75,44 @@
 
         <div class="ml-auto flex items-center gap-2">
             <button type="button" data-theme-toggle aria-label="Switch to dark mode" title="Switch to dark mode" class="header-choice inline-flex h-11 w-11 items-center justify-center rounded-full text-black transition hover:text-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 dark:text-white dark:hover:text-brand-200">
-                <svg data-theme-icon="moon" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 15.75A8.25 8.25 0 0 1 8.25 3.75a8.25 8.25 0 1 0 12 12Z" />
+                <svg data-theme-icon="moon" class="h-6 w-6" viewBox="0 0 24 24" aria-hidden="true">
+                    <defs>
+                        <radialGradient id="theme-moon-surface" cx="28%" cy="24%" r="86%">
+                            <stop offset="0" stop-color="#ffffff" />
+                            <stop offset="0.42" stop-color="#bfdbfe" />
+                            <stop offset="0.78" stop-color="#60a5fa" />
+                            <stop offset="1" stop-color="#1e40af" />
+                        </radialGradient>
+                    </defs>
+                    <path d="M20.8 14.7A8.9 8.9 0 0 1 9.3 3.2a9 9 0 1 0 11.5 11.5Z" fill="url(#theme-moon-surface)" stroke="#1e3a8a" stroke-width="0.8" />
+                    <path d="M7.3 8.1a7.1 7.1 0 0 1 3.3-3.6" fill="none" stroke="#fff" stroke-linecap="round" stroke-opacity="0.85" stroke-width="1.1" />
+                    <circle cx="9.1" cy="13.1" r="0.8" fill="#1e40af" fill-opacity="0.24" />
+                    <circle cx="12.1" cy="16.3" r="0.55" fill="#1e40af" fill-opacity="0.2" />
+                    <path d="M18.1 2.1v3.2m1.6-1.6h-3.2m3.9 6v2m1-1h-2" fill="none" stroke="#fbbf24" stroke-linecap="round" stroke-width="1.15" />
                 </svg>
-                <svg data-theme-icon="sun" class="hidden h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5m0 15V21m9-9h-1.5m-15 0H3m15.364 6.364-1.06-1.06M6.696 6.696l-1.06-1.06m12.728 0-1.06 1.06M6.696 17.304l-1.06 1.06M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
+                <svg data-theme-icon="sun" class="hidden h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+                    <defs>
+                        <radialGradient id="theme-sun-surface" cx="32%" cy="25%" r="78%">
+                            <stop offset="0" stop-color="#fff7bf" />
+                            <stop offset="0.46" stop-color="#fbbf24" />
+                            <stop offset="1" stop-color="#d97706" />
+                        </radialGradient>
+                        <linearGradient id="theme-sun-rays" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#fde68a" />
+                            <stop offset="1" stop-color="#f59e0b" />
+                        </linearGradient>
+                        <filter id="theme-sun-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="0.45" result="blur" />
+                            <feOffset dy="0.45" result="offset" />
+                            <feComponentTransfer><feFuncA type="linear" slope="0.24" /></feComponentTransfer>
+                            <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                        </filter>
+                    </defs>
+                    <g fill="none" stroke="url(#theme-sun-rays)" stroke-linecap="round" stroke-width="1.8">
+                        <path d="M12 1.4v2.4M12 20.2v2.4M1.4 12h2.4m16.4 0h2.4M4.5 4.5l1.7 1.7m11.6 11.6 1.7 1.7m0-15-1.7 1.7M6.2 17.8l-1.7 1.7" />
+                    </g>
+                    <circle cx="12" cy="12" r="5.1" fill="url(#theme-sun-surface)" stroke="#b45309" stroke-opacity="0.45" stroke-width="0.55" filter="url(#theme-sun-shadow)" />
+                    <ellipse cx="10.2" cy="9.7" rx="1.45" ry="0.85" fill="#fff" fill-opacity="0.38" transform="rotate(-35 10.2 9.7)" />
                 </svg>
             </button>
             @auth
