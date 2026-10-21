@@ -7,6 +7,7 @@ use App\Models\AttendanceImportBatch;
 use App\Models\AttendanceRecord;
 use App\Models\Branch;
 use App\Models\Employee;
+use App\Support\CsvSafe;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use Illuminate\Contracts\View\View;
@@ -33,7 +34,7 @@ class AttendanceImportController extends Controller
             $output = fopen('php://output', 'w');
             fputcsv($output, ['employee_number', 'shift_date', 'time_in', 'time_out']);
             foreach ($employees as $index => $employee) {
-                fputcsv($output, [$employee->employee_number, $sampleDate, $index === 0 ? '08:00' : '09:00', $index === 0 ? '17:00' : '18:00']);
+                fputcsv($output, [CsvSafe::cell($employee->employee_number), $sampleDate, $index === 0 ? '08:00' : '09:00', $index === 0 ? '17:00' : '18:00']);
             }
             fclose($output);
         }, 'biometric-attendance-sample.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);

@@ -136,25 +136,22 @@ class SaleController extends Controller
             ->with('status', "{$result['inserted']} sale line(s) saved for {$date}.");
     }
 
-    public function import(Request $request, SalesImportService $importer): View
+    public function import(): View
     {
         Gate::authorize('import', Sale::class);
 
-        $user = $request->user();
-        $result = null;
+        return $this->importView();
+    }
 
-        if ($request->hasFile('file')) {
-            $validated = $request->validate([
-                'file' => ['required', 'file', 'mimes:csv,txt', 'max:5120'],
-            ]);
+    public function importStore(Request $request, SalesImportService $importer): View
+    {
+        Gate::authorize('import', Sale::class);
 
-            $result = $importer->import($validated['file'], $user);
-        }
-
-        return view('admin.sales.import', [
-            'result' => $result,
-            'template' => implode(',', SalesImportService::EXPECTED_HEADERS),
+        $validated = $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,txt', 'max:5120'],
         ]);
+
+        return $this->importView($importer->import($validated['file'], $request->user()));
     }
 
     public function template(Request $request, SalesImportService $importer): StreamedResponse
@@ -198,6 +195,17 @@ class SaleController extends Controller
         $sale->delete();
 
         return back()->with('status', 'Sale removed.');
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $result
+     */
+    protected function importView(?array $result = null): View
+    {
+        return view('admin.sales.import', [
+            'result' => $result,
+            'template' => implode(',', SalesImportService::EXPECTED_HEADERS),
+        ]);
     }
 
     /**

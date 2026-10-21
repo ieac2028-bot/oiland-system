@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Sale;
+use App\Support\CsvSafe;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Response;
@@ -41,15 +42,15 @@ class SalesExportService
             foreach ($sales as $sale) {
                 fputcsv($handle, [
                     $sale->sale_date?->toDateString(),
-                    $sale->branch?->name,
-                    $sale->item_name,
+                    CsvSafe::cell($sale->branch?->name),
+                    CsvSafe::cell($sale->item_name),
                     number_format((float) $sale->quantity, 3, '.', ''),
                     number_format((float) $sale->unit_price, 2, '.', ''),
                     number_format((float) $sale->total_amount, 2, '.', ''),
                     $sale->currency,
                     $sale->payment_method?->label() ?? $sale->payment_method,
                     $sale->source?->label() ?? $sale->source,
-                    $sale->recorder?->name,
+                    CsvSafe::cell($sale->recorder?->name),
                 ]);
             }
 

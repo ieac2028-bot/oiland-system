@@ -27,7 +27,7 @@ Route::view('/how-it-works', 'platform')->name('platform');
 Route::get('/branches', [BranchDirectoryController::class, 'index'])->name('branches.index');
 Route::get('/branches/geocode', BranchGeocodeController::class)->middleware('throttle:10,1')->name('branches.geocode');
 Route::get('/branches/{branch}', [BranchDirectoryController::class, 'show'])->name('branches.show');
-Route::get('/branches/{branch}/route', BranchMapRouteController::class)->name('branches.route');
+Route::get('/branches/{branch}/route', BranchMapRouteController::class)->middleware('throttle:30,1')->name('branches.route');
 
 /*
 |--------------------------------------------------------------------------
@@ -221,7 +221,7 @@ Route::middleware(['auth', 'verified', 'role:'.UserRole::SuperAdmin->value.','.U
         Route::get('/sales/dashboard', Admin\SalesDashboardController::class)->name('sales.dashboard');
         Route::get('/sales/import', [Admin\SaleController::class, 'import'])->name('sales.import');
         Route::get('/sales/import/template', [Admin\SaleController::class, 'template'])->name('sales.import.template');
-        Route::post('/sales/import', [Admin\SaleController::class, 'import'])->name('sales.import.store');
+        Route::post('/sales/import', [Admin\SaleController::class, 'importStore'])->name('sales.import.store');
         Route::get('/sales/create', [Admin\SaleController::class, 'create'])->name('sales.create');
         Route::post('/sales', [Admin\SaleController::class, 'store'])->name('sales.store');
         Route::get('/sales/export/csv', [Admin\SalesExportController::class, 'csv'])->name('sales.export.csv');
