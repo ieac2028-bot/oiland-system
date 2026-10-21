@@ -71,7 +71,7 @@
                         <div class="mt-5">
                             <p class="text-sm font-semibold text-slate-800">Rows that were skipped</p>
                             <p class="mt-1 text-xs text-slate-500">
-                                These lines already existed for their date and branch, so they were left alone.
+                                Each skipped line is listed above with its reason, such as an unknown product, a future date, or sales that already exist for that item and date.
                             </p>
                         </div>
                     @endif

@@ -181,6 +181,35 @@ class PublicPagesTest extends TestCase
             ->assertJsonPath('message', 'The routing service returned an error.');
     }
 
+    public function test_branch_route_endpoint_rejects_unknown_profiles(): void
+    {
+        Http::fake();
+
+        $branch = Branch::factory()->create();
+
+        $this->getJson(route('branches.route', [$branch, 'lat' => 24.5, 'lng' => 54.5, 'profile' => '../../admin']))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['profile']);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_branch_route_endpoint_is_rate_limited(): void
+    {
+        Http::fake([
+            config('maps.osrm_url').'/*' => Http::response(['routes' => []]),
+        ]);
+
+        $branch = Branch::factory()->create();
+        $url = route('branches.route', [$branch, 'lat' => 24.5, 'lng' => 54.5]);
+
+        for ($attempt = 0; $attempt < 30; $attempt++) {
+            $this->getJson($url)->assertOk();
+        }
+
+        $this->getJson($url)->assertStatus(429);
+    }
+
     public function test_sales_totals_are_not_leaked_to_the_public_directory(): void
     {
         $this->get(route('branches.index'))->assertDontSee('total_amount');

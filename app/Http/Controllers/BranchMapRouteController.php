@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Services\OsrmRouter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class BranchMapRouteController extends Controller
 {
@@ -20,6 +21,7 @@ class BranchMapRouteController extends Controller
         $validated = $request->validate([
             'lat' => ['required', 'numeric', 'between:-90,90'],
             'lng' => ['required', 'numeric', 'between:-180,180'],
+            'profile' => ['nullable', Rule::in(['driving', 'walking', 'cycling'])],
         ]);
 
         if (! $branch->hasCoordinates()) {
@@ -34,7 +36,7 @@ class BranchMapRouteController extends Controller
                 originLng: (float) $validated['lng'],
                 destinationLat: (float) $branch->latitude,
                 destinationLng: (float) $branch->longitude,
-                profile: $request->string('profile')->toString() ?: 'driving',
+                profile: $validated['profile'] ?? 'driving',
             )
         );
     }

@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Support\ActivityAction;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -47,18 +46,13 @@ class SalesImportService
             ];
         }
 
-        $rows = $this->readRows($file);
+        ['headers' => $headers, 'rows' => $rows, 'malformed' => $malformed] = $this->readRows($file);
 
-        if ($rows === []) {
-            return ['imported' => 0, 'skipped' => 0, 'errors' => ['The uploaded file contains no data rows.'], 'rows' => []];
+        if ($headers === []) {
+            return ['imported' => 0, 'skipped' => 0, 'errors' => ['The uploaded file is empty.'], 'rows' => []];
         }
 
-        $header = array_map(
-            static fn (string $column): string => strtolower(trim($column)),
-            array_keys($rows[0]),
-        );
-
-        $missing = array_diff(self::EXPECTED_HEADERS, $header);
+        $missing = array_diff(self::EXPECTED_HEADERS, $headers);
 
         if ($missing !== []) {
             return [
@@ -71,10 +65,28 @@ class SalesImportService
 
         $errors = [];
         $parsed = [];
+        $parsedLines = [];
         $skipped = 0;
 
-        foreach ($rows as $index => $row) {
-            $lineNumber = $index + 2;
+        // Rows whose column count does not match the header used to vanish
+        // without a trace; report each one so the user can fix the file.
+        foreach ($malformed as $lineNumber) {
+            $errors[] = "Row {$lineNumber}: has the wrong number of columns and was skipped.";
+            $skipped++;
+        }
+
+        if ($rows === []) {
+            return [
+                'imported' => 0,
+                'skipped' => $skipped,
+                'errors' => ['The uploaded file contains no usable data rows.', ...$errors],
+                'rows' => [],
+            ];
+        }
+
+        foreach ($rows as $entry) {
+            $lineNumber = $entry['line'];
+            $row = $entry['data'];
 
             $catalogItem = $this->resolveCatalogItem($row);
 
@@ -89,6 +101,14 @@ class SalesImportService
 
             if ($saleDate === null) {
                 $errors[] = "Row {$lineNumber}: '".($row['sale_date'] ?? '')."' is not a valid sale date.";
+                $skipped++;
+
+                continue;
+            }
+
+            // Manual entry already refuses future dates; imports must too.
+            if ($saleDate->gt(today())) {
+                $errors[] = "Row {$lineNumber}: sale date {$saleDate->toDateString()} is in the future.";
                 $skipped++;
 
                 continue;
@@ -132,6 +152,34 @@ class SalesImportService
                 'notes' => null,
                 'recorded_by' => $actor->id,
             ];
+            $parsedLines[] = $lineNumber;
+        }
+
+        // Re-uploading a file must not double count revenue: a row is skipped
+        // when this branch already has sales for the same item on that date.
+        if ($parsed !== []) {
+            $dates = array_map(static fn (array $attributes): string => $attributes['sale_date']->toDateString(), $parsed);
+
+            $existing = Sale::query()
+                ->where('branch_id', $branch->id)
+                ->whereIn('catalog_item_id', array_unique(array_column($parsed, 'catalog_item_id')))
+                ->whereDate('sale_date', '>=', min($dates))
+                ->whereDate('sale_date', '<=', max($dates))
+                ->get(['catalog_item_id', 'sale_date'])
+                ->mapWithKeys(fn (Sale $sale): array => [$sale->catalog_item_id.'|'.$sale->sale_date->toDateString() => true])
+                ->all();
+
+            foreach ($parsed as $position => $attributes) {
+                $date = $attributes['sale_date']->toDateString();
+
+                if (isset($existing[$attributes['catalog_item_id'].'|'.$date])) {
+                    $errors[] = "Row {$parsedLines[$position]}: {$attributes['item_name']} already has sales recorded for {$date}, so it was left alone.";
+                    $skipped++;
+                    unset($parsed[$position]);
+                }
+            }
+
+            $parsed = array_values($parsed);
         }
 
         $imported = DB::transaction(function () use ($parsed): int {
@@ -206,14 +254,15 @@ class SalesImportService
     }
 
     /**
-     * @return Collection<int, array<string, string>>
+     * @return array{headers: array<int, string>, rows: array<int, array{line: int, data: array<string, string>}>, malformed: array<int, int>}
      */
-    protected function readRows(UploadedFile $file): Collection
+    protected function readRows(UploadedFile $file): array
     {
+        $empty = ['headers' => [], 'rows' => [], 'malformed' => []];
         $handle = fopen($file->getRealPath(), 'rb');
 
         if ($handle === false) {
-            return collect();
+            return $empty;
         }
 
         $headers = fgetcsv($handle);
@@ -221,7 +270,7 @@ class SalesImportService
         if ($headers === false) {
             fclose($handle);
 
-            return collect();
+            return $empty;
         }
 
         // Strip a UTF-8 byte order mark so the first header matches.
@@ -232,27 +281,36 @@ class SalesImportService
         );
 
         $rows = [];
+        $malformed = [];
+        $line = 1;
 
         // fgetcsv (rather than str_getcsv per line) so quoted values containing
         // commas or newlines are parsed correctly.
         while (($values = fgetcsv($handle)) !== false) {
+            $line++;
+
             if (count($values) === 1 && trim((string) $values[0]) === '') {
                 continue;
             }
 
             if (count($values) !== count($headers)) {
+                $malformed[] = $line;
+
                 continue;
             }
 
-            $rows[] = array_combine(
-                $headers,
-                array_map(static fn (?string $value): string => trim((string) $value), $values),
-            );
+            $rows[] = [
+                'line' => $line,
+                'data' => array_combine(
+                    $headers,
+                    array_map(static fn (?string $value): string => trim((string) $value), $values),
+                ),
+            ];
         }
 
         fclose($handle);
 
-        return collect($rows)->values();
+        return ['headers' => $headers, 'rows' => $rows, 'malformed' => $malformed];
     }
 
     protected function resolveCatalogItem(array $row): ?CatalogItem

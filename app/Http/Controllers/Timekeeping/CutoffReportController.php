@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\EmployeeSchedule;
 use App\Models\Holiday;
 use App\Services\AttendanceComputationService;
+use App\Support\CsvSafe;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
@@ -35,8 +36,8 @@ class CutoffReportController extends Controller
             fputcsv($output, ['Employee ID', 'Employee', 'Position', 'Branch', 'Scheduled days', 'Present days', 'Absences', 'Late occurrences', 'Tardy minutes', 'Undertime minutes', 'Regular hours', 'Approved overtime hours', 'Approved leave days', 'Incomplete records']);
             foreach ($data['rows'] as $row) {
                 fputcsv($output, [
-                    $row['employee']->employee_number, $row['employee']->user->name, $row['employee']->job_title,
-                    $row['employee']->user->branch?->name, $row['summary']['scheduled_workdays'], $row['summary']['present_days'],
+                    CsvSafe::cell($row['employee']->employee_number), CsvSafe::cell($row['employee']->user->name), CsvSafe::cell($row['employee']->job_title),
+                    CsvSafe::cell($row['employee']->user->branch?->name), $row['summary']['scheduled_workdays'], $row['summary']['present_days'],
                     $row['summary']['absences'], $row['summary']['late_occurrences'], $row['summary']['tardiness_minutes'],
                     $row['summary']['undertime_minutes'], $row['summary']['regular_hours'], $row['summary']['approved_overtime_hours'],
                     $row['summary']['approved_leave_days'], $row['summary']['incomplete_records'],
